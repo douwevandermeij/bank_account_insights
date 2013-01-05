@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript">
+
+        // Load the Visualization API and the piechart package.
+        google.load('visualization', '1', {'packages':['columnchart']});
+
+        // Set a callback to run when the Google Visualization API is loaded.
+        google.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            var categorieJsonData = $.ajax({
+                url: "categorie",
+                dataType:"json",
+                async: false
+            }).responseText;
+            var categorieData = JSON.parse(categorieJsonData);
+            categorieData.sort().reverse();
+
+            function getData(year, month) {
+                var url = "boeking"
+                if (year > 0)
+                    url += '?y=' + year
+                if (month > 0)
+                    url += '&m=' + month
+                var boekingJsonData = $.ajax({
+                    url: url,
+                    dataType:"json",
+                    async: false
+                }).responseText;
+                var boekingData = JSON.parse(boekingJsonData);
+
+                // Create our data table out of JSON data loaded from server.
+                //var data = google.visualization.arrayToDataTable(eval(jsonData));
+                //var data = new google.visualization.DataTable(jsonData);
+
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Maand');
+                for (var i in categorieData) {
+                    data.addColumn('number', categorieData[i]);
+                }
+
+                data.addRows(Object.keys(boekingData).length);
+                var days = [];
+                for (b in boekingData) {
+                    days.push(b);
+                }
+                days.sort();
+                for (var i=0; i < days.length; i++) {
+                    var b = days[i];
+                    data.setCell(i, 0, b);
+                    for (c in boekingData[b]) {
+                        data.setCell(i, categorieData.indexOf(c)+1, -boekingData[b][c]);
+                    }
+                }
+                return data;
+            }
+
+            // Instantiate and draw our chart, passing in some options.
+            {% for y in years %}
+                {% for m in months %}
+                    var chart = new google.visualization.ColumnChart(document.getElementById('chart_div_{{ y }}_{{ m }}'));
+                    chart.draw(getData({{ y }}, {{ m }}), {
+                        displayAnnotations:true,
+                        isStacked:true,
+                        width: 0,
+                        height: 700
+                    });
+                {% endfor %}
+            {% endfor %}
+        }
+
+    </script>
+</head>
+<body>
+{% for y in years %}
+    {% for m in months %}
+        <h1><a href="{% url index %}?y={{ y }}">{{ m }} - {{ y }}</a></h1>
+        <div id="chart_div_{{ y }}_{{ m }}"></div>
+        <hr />
+    {%  endfor %}
+{%  endfor %}
+</body>
+</html>

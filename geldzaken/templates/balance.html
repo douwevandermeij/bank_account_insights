@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript">
+
+        // Load the Visualization API and the piechart package.
+        google.load('visualization', '1', {'packages':['columnchart']});
+
+        // Set a callback to run when the Google Visualization API is loaded.
+        google.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            var boekingJsonData = $.ajax({
+                url: "boeking",
+                dataType:"json",
+                async: false
+            }).responseText;
+            var boekingData = JSON.parse(boekingJsonData);
+
+            var categorieJsonData = $.ajax({
+                url: "categorie",
+                dataType:"json",
+                async: false
+            }).responseText;
+            var categorieData = JSON.parse(categorieJsonData);
+
+            // Create our data table out of JSON data loaded from server.
+            //var data = google.visualization.arrayToDataTable(eval(jsonData));
+            //var data = new google.visualization.DataTable(jsonData);
+
+            var data = new google.visualization.DataTable();
+            data.addColumn('date', 'Datum');
+            for (var i in categorieData) {
+                data.addColumn('number', categorieData[i]);
+            }
+
+            data.addRows(Object.keys(boekingData).length);
+            var days = [];
+            for (b in boekingData) {
+                days.push(b);
+            }
+            days.sort();
+            for (var i=0; i < days.length; i++) {
+                var b = days[i];
+                data.setCell(i, 0, new Date(b));
+                for (c in boekingData[b]) {
+                    data.setCell(i, categorieData.indexOf(c)+1, -boekingData[b][c]);
+                }
+            }
+
+            // Instantiate and draw our chart, passing in some options.
+            var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+            chart.draw(data, {displayAnnotations:true, isStacked:true});
+        }
+
+    </script>
+</head>
+<body>
+<div id="chart_div" style="position: absolute; left: 50px; right: 50px; top: 50px; bottom: 50px;"></div>
+</body>
+</html>
