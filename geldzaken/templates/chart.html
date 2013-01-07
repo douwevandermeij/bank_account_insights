@@ -14,21 +14,17 @@
 
         function drawChart() {
             var categorieJsonData = $.ajax({
-                url: "categorie",
+                url: "{% url categorie %}",
                 dataType:"json",
                 async: false
             }).responseText;
             var categorieData = JSON.parse(categorieJsonData);
             categorieData.sort().reverse();
+            var len = categorieData.length;
 
             function getData(year, month) {
-                var url = "boeking"
-                if (year > 0)
-                    url += '?y=' + year
-                if (month > 0)
-                    url += '&m=' + month
                 var boekingJsonData = $.ajax({
-                    url: url,
+                    url: "{% url boeking year month %}",
                     dataType:"json",
                     async: false
                 }).responseText;
@@ -41,7 +37,7 @@
                 var data = new google.visualization.DataTable();
                 data.addColumn('string', 'Maand');
                 for (var i in categorieData) {
-                    data.addColumn('number', categorieData[i]);
+                    data.addColumn('number', categorieData[i][1], categorieData[i][0]);
                 }
 
                 data.addRows(Object.keys(boekingData).length);
@@ -53,36 +49,65 @@
                 for (var i=0; i < days.length; i++) {
                     var b = days[i];
                     data.setCell(i, 0, b);
-                    for (c in boekingData[b]) {
-                        data.setCell(i, categorieData.indexOf(c)+1, -boekingData[b][c]);
+                    for (id in boekingData[b]) {
+                        data.setCell(i, data.getColumnIndex(id), -boekingData[b][id]);
                     }
                 }
                 return data;
             }
 
             // Instantiate and draw our chart, passing in some options.
-            {% for y in years %}
-                {% for m in months %}
-                    var chart = new google.visualization.ColumnChart(document.getElementById('chart_div_{{ y }}_{{ m }}'));
-                    chart.draw(getData({{ y }}, {{ m }}), {
-                        displayAnnotations:true,
-                        isStacked:true,
-                        width: 0,
-                        height: 700
-                    });
-                {% endfor %}
-            {% endfor %}
+            var data = getData({{ year }}, {{ month }});
+            var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+            chart.draw(data, {
+                displayAnnotations:true,
+                isStacked:true,
+                width: 0,
+                height: 700
+            });
+            google.visualization.events.addListener(chart, 'select', function(){
+                var col = chart.getSelection()[0].column;
+                var row = chart.getSelection()[0].row;
+                if (row == null)
+                    col += 1;
+                var cat_id = data.getColumnId(col);
+                var detailsJson = $.ajax({
+                    url: "{% url details year month %}?cat=" + cat_id + "&r=" + row,
+                    dataType:"json",
+                    async: false
+                }).responseText;
+                var details = JSON.parse(detailsJson);
+                console.log(details);
+            });
         }
 
     </script>
 </head>
 <body>
-{% for y in years %}
-    {% for m in months %}
-        <h1><a href="{% url index %}?y={{ y }}">{{ m }} - {{ y }}</a></h1>
-        <div id="chart_div_{{ y }}_{{ m }}"></div>
-        <hr />
-    {%  endfor %}
-{%  endfor %}
+    <div id="navigation">
+        <ul>
+            <li><a href="{% url totaal %}">Jaar</a>
+                <ul>
+                    <li><a href="{% url year 2005 %}">2005</a></li>
+                    <li><a href="{% url year 2006 %}">2006</a></li>
+                    <li><a href="{% url year 2007 %}">2007</a></li>
+                    <li><a href="{% url year 2008 %}">2008</a></li>
+                    <li><a href="{% url year 2009 %}">2009</a></li>
+                    <li><a href="{% url year 2010 %}">2010</a></li>
+                    <li><a href="{% url year 2011 %}">2011</a></li>
+                    <li><a href="{% url year 2012 %}">2012</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div id="chart_div"></div>
+
+    <div id="details">
+        <table>
+            <th><td>Datum</td><td>Rekening</td><td>Categorie</td><td>Bedrag</td><td>Af</td></th>
+            <div id="rows"></div>
+        </table>
+    </div>
 </body>
 </html>
