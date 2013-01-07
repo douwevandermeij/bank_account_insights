@@ -21,6 +21,7 @@ class YearView(RequestContextTemplateView):
     def get_context_data(self, request, **kwargs):
         context = super(YearView, self).get_context_data(request, **kwargs)
 
+        context['years'] = range(2005, 2014)
         context['year'] = int(kwargs['year']) if 'year' in kwargs else 0
         context['month'] = 0
         return context
