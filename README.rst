@@ -1,5 +1,5 @@
 INSTALL
--------
+=======
 create a virtualenv
 pip install -r requirements.txt
 fab dev
@@ -12,7 +12,7 @@ column1=datum,column2=naam_omschrijving,column3=rekening,column4=tegenrekening,c
 
 
 USE
----
+===
 Import csv using the Django Admin interface
 Import into RawData
 Select the rows in RawData table, use action 'Process Data', now Rekeningen and Boekingen will be filled.

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from geldzaken.core.models import Rekening, Boeking, RawData, Categorie
+from geldzaken.core.models import Rekening, Boeking, RawData, Categorie, CategorizeFilter
 from datetime import datetime
 
 
@@ -32,20 +32,8 @@ def process(modeladmin, request, queryset):
 process.short_description = "Process data"
 
 def categorize(modeladmin, request, queryset):
-    queryset.filter(mutatiesoort="Geldautomaat").update(categorie=2)
-    queryset.filter(mededelingen__contains="polis").update(categorie=5)
-    queryset.filter(mededelingen__contains="albert").update(categorie=13)
-    queryset.filter(mededelingen__contains="klim").update(categorie=14)
-    queryset.filter(mededelingen__contains="c1000").update(categorie=13)
-    queryset.filter(mededelingen__contains="edah").update(categorie=13)
-    queryset.filter(mededelingen__contains="aldi").update(categorie=13)
-    queryset.filter(mededelingen__contains="lidl").update(categorie=13)
-    queryset.filter(mededelingen__contains="plus").update(categorie=13)
-    queryset.filter(mededelingen__contains="shell").update(categorie=3)
-    queryset.filter(mededelingen__contains="esso").update(categorie=3)
-    queryset.filter(mededelingen__contains="tinq").update(categorie=3)
-    queryset.filter(mededelingen__contains="firezone").update(categorie=3)
-    queryset.filter(mededelingen__contains='bremer').update(categorie=3)
+    for cf in CategorizeFilter.objects.all():
+        queryset.filter(**{cf.field: cf.value}).update(categorie=cf.categorie)
 categorize.short_description = "Categorize data"
 
 
@@ -81,6 +69,10 @@ class RawDataAdmin(admin.ModelAdmin):
     actions = [process]
 
 
+class CategorizeFilterAdmin(admin.ModelAdmin):
+    list_display = ('field', 'value', 'categorie', )
+
+admin.site.register(CategorizeFilter, CategorizeFilterAdmin)
 admin.site.register(Categorie, CategorieAdmin)
 admin.site.register(Rekening, RekeningAdmin)
 admin.site.register(Boeking, BoekingAdmin)

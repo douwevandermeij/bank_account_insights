@@ -51,7 +51,7 @@
                     var b = days[i];
                     data.setCell(i, 0, b);
                     for (id in boekingData[b]) {
-                        data.setCell(i, data.getColumnIndex(id), -boekingData[b][id]);
+                        data.setCell(i, data.getColumnIndex(id), boekingData[b][id]);
                     }
                 }
                 return data;

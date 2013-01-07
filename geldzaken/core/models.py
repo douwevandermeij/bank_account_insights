@@ -1,10 +1,5 @@
 from django.db import models
-from django.db.models import Sum, Q
-
-
-class BoekingenManager(models.Manager):
-    def get_query_set(self):
-        return super(BoekingenManager, self).get_query_set().filter(author='Roald Dahl')
+from django.db.models import Q
 
 
 class Categorie(models.Model):
@@ -15,8 +10,6 @@ class Categorie(models.Model):
         return self.naam
 
     naam = models.CharField(max_length=255)
-
-#    boekingen = BoekingenManager()
 
     def totaal(self):
         totals = [b.netto() for b in Boeking.objects.filter(
@@ -58,8 +51,8 @@ class Boeking(models.Model):
 
     def netto(self):
         if self.af:
-            return self.bedrag
-        return -self.bedrag
+            return -self.bedrag
+        return self.bedrag
 
     def cat(self):
         if self.categorie == None:
@@ -79,3 +72,9 @@ class RawData(models.Model):
     mededelingen = models.CharField(max_length=255)
 
     processed = models.BooleanField(default=False)
+
+
+class CategorizeFilter(models.Model):
+    field = models.CharField(max_length=255)
+    value = models.CharField(max_length=255)
+    categorie = models.ForeignKey(Categorie)
