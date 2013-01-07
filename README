@@ -1,7 +1,8 @@
 INSTALL
 -------
 create a virtualenv
-pip install -r requirements
+pip install -r requirements.txt
+fab dev
 python manage.py syncdb -all
 python manage.py migrate --fake
 python manage.py runserver
