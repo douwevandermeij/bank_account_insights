@@ -15,9 +15,17 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 
 DATABASES = {
 {% ifequal name "dev" %}
-'default': {
-    'ENGINE': 'django.db.backends.sqlite3',
-    'NAME': os.path.join(PROJECT_DIR, 'database.db'),
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'geldzaken',
+        'USER': 'geldzaken',
+        'PASSWORD': 'secret',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    },
+    'sqlite': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(PROJECT_DIR, 'database.db'),
     }
 {% else %}
     'default': {

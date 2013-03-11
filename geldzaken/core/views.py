@@ -1,7 +1,7 @@
 import json
 from django.http import HttpResponse
 from django.views.generic import TemplateView, View
-from geldzaken.core.models import Boeking, Categorie
+from geldzaken.core.models import Categorie
 from geldzaken.core.utils import get_boekingen
 
 
@@ -30,8 +30,17 @@ class YearView(RequestContextTemplateView):
 class DetailView(View):
 
     def get(self, request, *args, **kwargs):
+        data = []
         boekingen, dateformat = get_boekingen(request, **kwargs)
-        return HttpResponse(json.dumps(boekingen),mimetype='application/json')
+        for b in boekingen:
+            row = {}
+            row['datum'] = b.datum.strftime('%d-%m-%Y')
+            row['tegenrekening'] = b.tegenrekening.__unicode__()
+            row['categorie'] = b.cat().naam
+            row['bedrag'] = b.bedrag
+            row['af'] = b.af
+            data.append(row)
+        return HttpResponse(json.dumps(data),mimetype='application/json')
 
 
 class BoekingView(View):

@@ -67,6 +67,7 @@ class BoekingAdmin(admin.ModelAdmin):
 class RawDataAdmin(admin.ModelAdmin):
     list_display = ('datum', 'naam_omschrijving', 'tegenrekening', 'bedrag', 'mededelingen', 'processed', )
     actions = [process]
+    search_fields = ['datum']
 
 
 class CategorizeFilterAdmin(admin.ModelAdmin):

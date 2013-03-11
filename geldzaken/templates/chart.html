@@ -69,16 +69,26 @@
             google.visualization.events.addListener(chart, 'select', function(){
                 var col = chart.getSelection()[0].column;
                 var row = chart.getSelection()[0].row;
+
                 if (row == null)
                     col += 1;
                 var cat_id = data.getColumnId(col);
+
                 var detailsJson = $.ajax({
                     url: "{% url details year month %}?cat=" + cat_id + "&r=" + row,
                     dataType:"json",
                     async: false
                 }).responseText;
                 var details = JSON.parse(detailsJson);
-                console.log(details);
+
+                for (d in details) {
+                    console.log($('#details_table'));
+                    $('#details_table').add('tr').add('td').html(d['datum']);
+                    $('#details_table').add('tr').tr.add('td').html(d['tegenrekening']);
+                    $('#details_table').add('tr').tr.add('td').html(d['categorie']);
+                    $('#details_table').add('tr').tr.add('td').html(d['bedrag']);
+                    $('#details_table').add('tr').tr.add('td').html(d['af']);
+                }
             });
         }
 
@@ -100,7 +110,7 @@
     <div id="chart_div"></div>
 
     <div id="details">
-        <table>
+        <table id="details_table">
             <tr>
                 <td>{% trans "Datum" %}</td>
                 <td>{% trans "Rekening" %}</td>
@@ -108,7 +118,6 @@
                 <td>{% trans "Bedrag" %}</td>
                 <td>{% trans "Af" %}</td>
             </tr>
-            <div id="rows"></div>
         </table>
     </div>
 </body>

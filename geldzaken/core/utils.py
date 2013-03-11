@@ -1,3 +1,4 @@
+from django.db.models import Q
 from geldzaken.core.models import Boeking
 
 
@@ -13,6 +14,12 @@ def get_boekingen(request, **kwargs):
         dateformat = '%Y'
 
     if 'cat' in request.GET and int(request.GET['cat']) > 0:
-        boekingen = boekingen.filter(cat__=kwargs['cat'])
+        boekingen = boekingen.filter(Q(
+            Q(categorie=None) & Q(tegenrekening__categorie=int(request.GET['cat']))
+        ) | Q(categorie=int(request.GET['cat'])))
+
+    cat = 4
+    boekingen = boekingen.exclude(categorie=cat)
+    boekingen = boekingen.exclude(categorie=None, tegenrekening__categorie=cat)
 
     return (boekingen, dateformat)
