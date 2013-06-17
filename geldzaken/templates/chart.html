@@ -69,25 +69,39 @@
             google.visualization.events.addListener(chart, 'select', function(){
                 var col = chart.getSelection()[0].column;
                 var row = chart.getSelection()[0].row;
+                var month = row+1;
 
-                if (row == null)
+                if (row == null) { // click on category label
                     col += 1;
+                    month = 0;
+                }
                 var cat_id = data.getColumnId(col);
 
                 var detailsJson = $.ajax({
-                    url: "{% url details year month %}?cat=" + cat_id + "&r=" + row,
+                    url: "{% url details year month %}?cat=" + cat_id + "&mon=" + month,
                     dataType:"json",
                     async: false
                 }).responseText;
                 var details = JSON.parse(detailsJson);
 
-                for (d in details) {
-                    console.log($('#details_table'));
-                    $('#details_table').add('tr').add('td').html(d['datum']);
-                    $('#details_table').add('tr').tr.add('td').html(d['tegenrekening']);
-                    $('#details_table').add('tr').tr.add('td').html(d['categorie']);
-                    $('#details_table').add('tr').tr.add('td').html(d['bedrag']);
-                    $('#details_table').add('tr').tr.add('td').html(d['af']);
+                $('#details_table').html('<tr>' +
+                        '<td>Datum</td>' +
+                        '<td>Rekening</td>' +
+                        '<td>Categorie</td>' +
+                        '<td>Mededelingen</td>' +
+                        '<td>Bedrag</td>' +
+                        '<td>Af</td>' +
+                        '</tr>');
+                for (var i in details) {
+                    var d = details[i];
+                    $('#details_table').append('<tr>' +
+                            '<td>' + d['datum'] + '</td>' +
+                            '<td>' + d['tegenrekening'] + '</td>' +
+                            '<td>' + d['categorie'] + '</td>' +
+                            '<td>' + d['mededelingen'] + '</td>' +
+                            '<td>' + d['bedrag'] + '</td>' +
+                            '<td>' + d['af'] + '</td>' +
+                            '</tr>');
                 }
             });
         }

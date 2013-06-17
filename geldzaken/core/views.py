@@ -38,6 +38,7 @@ class DetailView(View):
             row['tegenrekening'] = b.tegenrekening.__unicode__()
             row['categorie'] = b.cat().naam
             row['bedrag'] = b.bedrag
+            row['mededelingen'] = b.mededelingen
             row['af'] = b.af
             data.append(row)
         return HttpResponse(json.dumps(data),mimetype='application/json')

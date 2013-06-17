@@ -8,6 +8,8 @@ def get_boekingen(request, **kwargs):
         dateformat = '%Y-%m-%d'
     elif int(kwargs['year']) > 0:
         boekingen = Boeking.objects.filter(datum__year=kwargs['year']).order_by('datum')
+        if 'mon' in request.GET and int(request.GET['mon']) > 0:
+            boekingen = boekingen.filter(datum__month=int(request.GET['mon']))
         dateformat = '%m'
     else:
         boekingen = Boeking.objects.all().order_by('datum')
