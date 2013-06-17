@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <title>Geldzaken</title>
     <!--Load the AJAX API-->
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.3.min.js"></script>
@@ -109,29 +110,25 @@
     </script>
 </head>
 <body>
-    <div id="navigation">
-        <ul>
-            <li><a href="{% url totaal %}">{% trans "Jaar" %}</a>
-                <ul>
-                    {% for y in years %}
-                        <li><a href="{% url year y %}">{{ y }}</a></li>
-                    {% endfor %}
-                </ul>
+    <div>
+        <ul id="navigation">
+            <li {% if year == 0 %}class="active" {% endif %}>
+                <a href="{% url totaal %}">{% trans "Totaal" %}</a>
             </li>
+            {% for y in years %}
+                <li {% if year == y %}class="active" {% endif %}>
+                    <a href="{% url year y %}">{{ y }}</a>
+                </li>
+            {% endfor %}
         </ul>
     </div>
+
+    <h1 id="page_title">{% if year == 0 %}{% trans "Totaal" %}{% else %}{{ year }}{% endif %}</h1>
 
     <div id="chart_div"></div>
 
     <div id="details">
         <table id="details_table">
-            <tr>
-                <td>{% trans "Datum" %}</td>
-                <td>{% trans "Rekening" %}</td>
-                <td>{% trans "Categorie" %}</td>
-                <td>{% trans "Bedrag" %}</td>
-                <td>{% trans "Af" %}</td>
-            </tr>
         </table>
     </div>
 </body>

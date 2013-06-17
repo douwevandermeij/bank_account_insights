@@ -3,3 +3,4 @@ south
 fabric
 psycopg2
 django-csvimport
+git+git://github.com/Goldmund-Wyldebeast-Wunderliebe/django-diazo.git

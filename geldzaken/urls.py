@@ -1,3 +1,5 @@
+import os
+from django.conf import settings
 from django.conf.urls import patterns, include, url
 from geldzaken.core import urls as core_urls
 
@@ -19,3 +21,9 @@ urlpatterns = patterns('',
 )
 
 urlpatterns += core_urls.urlpatterns
+
+if settings.DEBUG:
+    urlpatterns += patterns('',
+       url(r'^%s/themes/(?P<path>.*)$' % settings.MEDIA_URL.strip('/'), 'django.views.static.serve',
+           {'document_root': os.path.join(settings.MEDIA_ROOT, 'themes'), 'show_indexes': True}),
+    )
