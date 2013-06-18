@@ -146,6 +146,7 @@ INSTALLED_APPS = (
     'django_diazo',
 
     'geldzaken.core',
+    'geldzaken.theme',
 )
 
 DIAZO_LOG_FILE = 'django_diazo.log'

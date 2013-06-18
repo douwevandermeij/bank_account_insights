@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rules
+    xmlns="http://namespaces.plone.org/diazo"
+    xmlns:css="http://namespaces.plone.org/diazo/css"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  
+    <append theme="/html/head"
+            content="/html/head/script"
+            />
+
+    <!-- Disable theme for Django Admin -->
+    <notheme if-path="admin" />
+
+    <!-- Enable theme -->
+    <theme href="bootstrap/index.html" />
+  
+    <replace theme="/html/head/title"
+             content="/html/head/title" />
+  
+    <replace css:theme-children="h3.muted"
+             content-children="/html/head/title" />
+  
+    <replace css:theme-children="ul.nav"
+             css:content-children="#navigation" />
+  
+    <replace css:theme-children=".jumbotron"
+             css:content="h1#page_title" />
+  
+    <append css:theme=".jumbotron"
+            css:content="#chart_div" />
+  
+    <replace css:theme-children=".marketing"
+             css:content="#details_table" />
+
+</rules>
