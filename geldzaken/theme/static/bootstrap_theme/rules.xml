@@ -8,6 +8,10 @@
             content="/html/head/script"
             />
 
+    <append theme="/html/head"
+            content="/html/head/style"
+            />
+
     <!-- Disable theme for Django Admin -->
     <notheme if-path="admin" />
 

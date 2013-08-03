@@ -9,7 +9,7 @@
     <script type="text/javascript">
 
         // Load the Visualization API and the piechart package.
-        google.load('visualization', '1', {'packages':['columnchart']});
+        google.load('visualization', '1', {'packages': ['columnchart']});
 
         // Set a callback to run when the Google Visualization API is loaded.
         google.setOnLoadCallback(drawChart);
@@ -17,7 +17,7 @@
         function drawChart() {
             var categorieJsonData = $.ajax({
                 url: "{% url categorie %}",
-                dataType:"json",
+                dataType: "json",
                 async: false
             }).responseText;
             var categorieData = JSON.parse(categorieJsonData);
@@ -27,7 +27,7 @@
             function getData(year, month) {
                 var boekingJsonData = $.ajax({
                     url: "{% url boeking year month %}",
-                    dataType:"json",
+                    dataType: "json",
                     async: false
                 }).responseText;
                 var boekingData = JSON.parse(boekingJsonData);
@@ -48,7 +48,7 @@
                     days.push(b);
                 }
                 days.sort();
-                for (var i=0; i < days.length; i++) {
+                for (var i = 0; i < days.length; i++) {
                     var b = days[i];
                     data.setCell(i, 0, b);
                     for (id in boekingData[b]) {
@@ -62,15 +62,15 @@
             var data = getData({{ year }}, {{ month }});
             var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
             chart.draw(data, {
-                displayAnnotations:true,
-                isStacked:true,
+                displayAnnotations: true,
+                isStacked: true,
                 width: 0,
                 height: 500
             });
-            google.visualization.events.addListener(chart, 'select', function(){
+            google.visualization.events.addListener(chart, 'select', function () {
                 var col = chart.getSelection()[0].column;
                 var row = chart.getSelection()[0].row;
-                var month = row+1;
+                var month = row + 1;
 
                 if (row == null) { // click on category label
                     col += 1;
@@ -80,7 +80,7 @@
 
                 var detailsJson = $.ajax({
                     url: "{% url details year month %}?cat=" + cat_id + "&mon=" + month,
-                    dataType:"json",
+                    dataType: "json",
                     async: false
                 }).responseText;
                 var details = JSON.parse(detailsJson);
@@ -91,8 +91,9 @@
                         '<th>Categorie</th>' +
                         '<th>Mededelingen</th>' +
                         '<th>Bedrag</th>' +
-                        '<th>Af</th>' +
                         '</tr>');
+
+                var total = 0.0;
                 for (var i in details) {
                     var d = details[i];
                     $('#details_table').append('<tr>' +
@@ -100,36 +101,62 @@
                             '<td>' + d['tegenrekening'] + '</td>' +
                             '<td>' + d['categorie'] + '</td>' +
                             '<td>' + d['mededelingen'] + '</td>' +
-                            '<td>' + d['bedrag'] + '</td>' +
-                            '<td>' + d['af'] + '</td>' +
+                            '<td class="' + (d['af'] ? 'af' : 'bij') + '">' + d['bedrag'].toFixed(2) + '</td>' +
                             '</tr>');
+                    if (d['af']) {
+                        total -= d['bedrag'];
+                    } else {
+                        total += d['bedrag'];
+                    }
                 }
+                $('#details_table').append('<tr>' +
+                        '<td class="total">Totaal</td>' +
+                        '<td colspan="4" class="total">' + total.toFixed(2) + '</td>' +
+                        '</tr>');
             });
         }
 
     </script>
+    <style type="text/css">
+        .af {
+            font-weight: bold;
+            text-align: right !important;
+            color: red;
+        }
+
+        .bij {
+            font-weight: bold;
+            text-align: right !important;
+            color: green;
+        }
+
+        .total {
+            font-weight: bold;
+            text-align: right !important;
+        }
+    </style>
 </head>
 <body>
-    <div>
-        <ul id="navigation">
-            <li {% if year == 0 %}class="active" {% endif %}>
-                <a href="{% url totaal %}">{% trans "Totaal" %}</a>
+<div>
+    <ul id="navigation">
+        <li {% if year == 0 %}class="active" {% endif %}>
+            <a href="{% url totaal %}">{% trans "Totaal" %}</a>
+        </li>
+        {% for y in years %}
+            <li {% if year == y %}class="active" {% endif %}>
+                <a href="{% url year y %}">{{ y }}</a>
             </li>
-            {% for y in years %}
-                <li {% if year == y %}class="active" {% endif %}>
-                    <a href="{% url year y %}">{{ y }}</a>
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
+        {% endfor %}
+    </ul>
+</div>
 
-    <h1 id="page_title">{% if year == 0 %}{% trans "Totaal" %}{% else %}{{ year }}{% endif %}</h1>
+<h1 id="page_title">{% if year == 0 %}{% trans "Totaal" %}{% else %}{{ year }}{% endif %}</h1>
 
-    <div id="chart_div"></div>
+<div id="chart_div"></div>
 
-    <div id="details">
-        <table id="details_table" class="table">
-        </table>
-    </div>
+<div id="details">
+    <table id="details_table" class="table">
+    </table>
+</div>
 </body>
 </html>
